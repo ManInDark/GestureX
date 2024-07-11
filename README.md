@@ -112,3 +112,9 @@ This project utilizes the following libraries:
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
+# Installation Problems
+
+## Debian
+
+If pip won't install PyGObject because pycairo is missing, you should check if you have the `libgtk-4-dev` package installed.
+If python complains about missing `cv2`, you'll need the `python3-opencv` package. Afterwards rebuild the venv.
