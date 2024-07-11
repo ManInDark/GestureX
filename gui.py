@@ -1,9 +1,9 @@
+import mediapipe as mp
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, GdkPixbuf, Gdk, GLib
 import cv2
 import numpy as np
-import mediapipe as mp
 from keras.models import load_model
 import threading
 import os
