@@ -9,6 +9,8 @@ import threading
 import os
 import json
 import time
+import argparse
+import pathlib
 
 class_names = ['okay', 'peace', 'thumbs up', 'thumbs down', 'call me', 'stop', 'rock', 'live long', 'fist', 'smile']
 
@@ -175,6 +177,14 @@ class Main(Gtk.Window):
         toggle_button_row.attach_next_to(self.trace_button, self.preview_button, Gtk.PositionType.RIGHT, 1, 1)
         toggle_button_row.attach_next_to(self.class_button, self.trace_button, Gtk.PositionType.RIGHT, 1, 1)
 
+        # parsing arguments to check if file has been passed
+        parser = argparse.ArgumentParser()
+        parser.add_argument("-c", "--config", dest="filename", type=pathlib.Path, required=False)
+        args = parser.parse_args()
+
+        if args.filename is not None:
+            self.import_json(args.filename)
+
         self.cap = cv2.VideoCapture(0)
         self.running = True
         self.preview_enabled = False
@@ -284,6 +294,14 @@ class Main(Gtk.Window):
             print(f"Error exporting gesture commands: {str(e)}")
             self.show_confirmation_message(self, "Error exporting gesture commands (check console for details)")
 
+    def import_json(self, path):
+        with open(path, 'r') as f:
+            data = json.load(f)
+            for label, command in data.items():
+                self.text_entries[label].set_text(command)
+        print(f"Gesture commands imported from {path}")
+
+
     def on_import_clicked(self, widget):
         dialog = Gtk.FileChooserDialog(title="Please choose a JSON file", parent=self, action=Gtk.FileChooserAction.OPEN)
         dialog.add_buttons(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK)
@@ -296,11 +314,7 @@ class Main(Gtk.Window):
         response = dialog.run()
         if response == Gtk.ResponseType.OK:
             filename = dialog.get_filename()
-            with open(filename, 'r') as f:
-                data = json.load(f)
-                for label, command in data.items():
-                    self.text_entries[label].set_text(command)
-            print(f"Gesture commands imported from {filename}")
+            self.import_json(filename)
         elif response == Gtk.ResponseType.CANCEL:
             print("Import operation cancelled")
 
